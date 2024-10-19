@@ -36,7 +36,7 @@ async function doClaim(privateKey) {
     return txResponse.hash;
 
   } catch (error) {
-    const errorMessage = `[${moment().format('HH:mm:ss')}] Error executing transaction: ${error.message}`;
+    const errorMessage = `[${moment().tz('Asia/Jakarta').format('HH:mm:ss [WIB]')}] Error executing transaction: ${error.message}`;
     console.log(errorMessage.red);
     appendLog(errorMessage);
   }
