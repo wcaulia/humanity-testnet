@@ -36,7 +36,7 @@ async function doClaim(privateKey) {
     return txResponse.hash;
 
   } catch (error) {
-    const errorMessage = `[${moment().tz('Asia/Jakarta').format('HH:mm:ss [WIB]')}] Error executing transaction: ${error.message}`;
+    const errorMessage = `[$timezone] Error executing transaction: ${error.message}`;
     console.log(errorMessage.red);
     appendLog(errorMessage);
   }
@@ -44,18 +44,18 @@ async function doClaim(privateKey) {
 
 async function runClaim() {
   displayHeader();
-
+  const timezone = moment().tz('Asia/Jakarta').format('HH:mm:ss [WIB] DD-MM-YYYY');
   for (const PRIVATE_KEY of PRIVATE_KEYS) {
     try {
       const receiptTx = await doClaim(PRIVATE_KEY);
       if (receiptTx) {
-        const successMessage = `[${moment().tz('Asia/Jakarta').format('HH:mm:ss [WIB]')}] Transaction Hash: ${explorer.tx(receiptTx)}`;
+        const successMessage = `[${timezone}] Transaction Hash: ${explorer.tx(receiptTx)}`;
         console.log(successMessage.cyan);
         appendLog(successMessage);
       }
       console.log('');
     } catch (error) {
-      const errorMessage = `[${moment().tz('Asia/Jakarta').format('HH:mm:ss [WIB]')}] Error processing transaction. Please try again later.`;
+      const errorMessage = `[${timezone}] Error processing transaction. Please try again later.`;
       console.log(errorMessage.red);
       appendLog(errorMessage);
       console.log('');
