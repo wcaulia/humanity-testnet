@@ -14,8 +14,8 @@ function appendLog(message) {
   fs.appendFileSync('log.txt', message + '\n');
 }
 async function doClaimDaily(privateKey) {
+  const wallet = new Wallet(privateKey, provider);
   try {
-    const wallet = new Wallet(privateKey, provider);
     const implementationContract = new Contract(
       IMPLEMENT_CA,
       ABI,
@@ -29,38 +29,42 @@ async function doClaimDaily(privateKey) {
     };
     const txResponse = await wallet.sendTransaction(transaction);
     const receipt = await txResponse.wait(1);
-    const successMessage = `Transaction Confirmed for claim Daily Reward in block ${receipt.blockNumber}`;
+    const successMessage = `Transaction Confirmed for Wallet Address ${wallet.address}`;
     console.log(successMessage.blue);
     appendLog(successMessage);
     return txResponse.hash;
 
   } catch (error) {
-    const errorMessage = `Error executing transaction: ${error.message}`;
-    console.log(errorMessage.red);
-    appendLog(errorMessage);
+    if (error.message.includes("Rewards: no rewards available")) {
+      const message = `Wallet Address ${wallet.address} has been claimed daily reward.`;
+      console.log(message.red);
+      appendLog(message);
+    } else {
+      const errorMessage = `Error executing transaction: ${error.message}`;
+      console.log(errorMessage.red);
+      appendLog(errorMessage);
+    }
   }
 }
 
 async function runClaim() {
   displayHeader();
   const timezone = moment().tz('Asia/Jakarta').format('HH:mm:ss [WIB] DD-MM-YYYY');
+  const timeExecute = `At time ${timezone}`;
+  console.log(timeExecute);
+  appendLog(timeExecute);
   for (const PRIVATE_KEY of PRIVATE_KEYS) {
     try {
-      const timeExecute = `At time ${timezone}`;
-      console.log(timeExecute);
-      appendLog(timeExecute);
       const receiptTx = await doClaimDaily(PRIVATE_KEY);
       if (receiptTx) {
         const successMessage = `Transaction Hash: ${explorer.tx(receiptTx)}`;
         console.log(successMessage.cyan);
         appendLog(successMessage);
       }
-      console.log('');
     } catch (error) {
       const errorMessage = `Error processing transaction. Please try again later.`;
       console.log(errorMessage.red);
       appendLog(errorMessage);
-      console.log('');
     }
   }
   appendLog('');
