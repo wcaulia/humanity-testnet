@@ -13,7 +13,6 @@ const IMPLEMENT_CA = '0x097aE35C5093Ae222e93a6c2b32927995130721F';
 function appendLog(message) {
   fs.appendFileSync('log.txt', message + '\n');
 }
-
 async function doClaim(privateKey) {
   try {
     const wallet = new Wallet(privateKey, provider);
@@ -30,13 +29,13 @@ async function doClaim(privateKey) {
     };
     const txResponse = await wallet.sendTransaction(transaction);
     const receipt = await txResponse.wait(1);
-    const successMessage = `Transaction Confirmed in block ${receipt.blockNumber}`;
+    const successMessage = `Transaction Confirmed for claim Daily Reward in block ${receipt.blockNumber}`;
     console.log(successMessage.blue);
     appendLog(successMessage);
     return txResponse.hash;
 
   } catch (error) {
-    const errorMessage = `[$timezone] Error executing transaction: ${error.message}`;
+    const errorMessage = `Error executing transaction: ${error.message}`;
     console.log(errorMessage.red);
     appendLog(errorMessage);
   }
@@ -47,20 +46,23 @@ async function runClaim() {
   const timezone = moment().tz('Asia/Jakarta').format('HH:mm:ss [WIB] DD-MM-YYYY');
   for (const PRIVATE_KEY of PRIVATE_KEYS) {
     try {
-      const receiptTx = await doClaim(PRIVATE_KEY);
+      const timeExecute = `At time ${timezone}`;
+      console.log(timeExecute);
+      appendLog(timeExecute);
+      const receiptTx = await doClaimDaily(PRIVATE_KEY);
       if (receiptTx) {
-        const successMessage = `[${timezone}] Transaction Hash: ${explorer.tx(receiptTx)}`;
+        const successMessage = `Transaction Hash: ${explorer.tx(receiptTx)}`;
         console.log(successMessage.cyan);
         appendLog(successMessage);
       }
       console.log('');
     } catch (error) {
-      const errorMessage = `[${timezone}] Error processing transaction. Please try again later.`;
+      const errorMessage = `Error processing transaction. Please try again later.`;
       console.log(errorMessage.red);
       appendLog(errorMessage);
       console.log('');
     }
   }
+  appendLog('');
 }
-
 runClaim();
