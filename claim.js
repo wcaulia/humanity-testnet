@@ -13,7 +13,7 @@ const IMPLEMENT_CA = '0x097aE35C5093Ae222e93a6c2b32927995130721F';
 function appendLog(message) {
   fs.appendFileSync('log.txt', message + '\n');
 }
-async function doClaim(privateKey) {
+async function doClaimDaily(privateKey) {
   try {
     const wallet = new Wallet(privateKey, provider);
     const implementationContract = new Contract(
